@@ -1,0 +1,38 @@
+name: Atualizar Frase do Dia
+
+on:
+  schedule:
+    - cron: '1 3 * * *' # Todos os dias às 00:01 no horário de Brasília (03:01 UTC)
+  workflow_dispatch:    # Permite rodar manualmente também
+
+jobs:
+  update-phrase:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do repositório
+        uses: actions/checkout@v3
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Gerar frase do dia
+        run: |
+          node -e "
+            const fs = require('fs');
+            const frases = JSON.parse(fs.readFileSync('frases.json'));
+            const hoje = new Date();
+            const diaDoAno = Math.floor((hoje - new Date(hoje.getFullYear(), 0, 0)) / 86400000);
+            const frase = frases[diaDoAno % frases.length];
+            fs.writeFileSync('frase-do-dia.txt', frase);
+          "
+
+      - name: Commit e push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add frase-do-dia.txt
+          git commit -m "Atualiza frase do dia: $(date +'%d/%m/%Y')" || echo "Nada para commitar"
+          git push

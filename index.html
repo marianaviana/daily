@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Frase do Dia - Mariana Viana</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="container">
+    <h1>Frase do Dia</h1>
+    <blockquote id="frase">Carregando frase...</blockquote>
+    <span class="data" id="data"></span>
+  </div>
+
+  <script>
+    fetch('frase-do-dia.txt')
+      .then(response => response.text())
+      .then(text => {
+        document.getElementById('frase').textContent = text.trim();
+      });
+
+    const hoje = new Date();
+    document.getElementById('data').textContent = hoje.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    });
+  </script>
+</body>
+
+</html>

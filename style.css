@@ -1,0 +1,35 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: #0B1220;
+  color: #F4F4F4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.container {
+  text-align: center;
+  max-width: 600px;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  color: #ffffff;
+}
+
+blockquote {
+  font-size: 1.5rem;
+  font-style: italic;
+  margin: 0 0 1rem 0;
+  color: #B3C7E6;
+}
+
+.data {
+  font-size: 0.9rem;
+  color: #888;
+}
