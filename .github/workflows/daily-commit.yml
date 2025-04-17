@@ -1,52 +1,52 @@
-name: Atualizar Frase do Dia
+name: update-daily-quote
 
 on:
   schedule:
-    - cron: '1 3 * * *' # Todos os dias às 00:01 no horário de Brasília (03:01 UTC)
-  workflow_dispatch:    # Permite rodar manualmente também
+    - cron: "1 3 * * *" # Every day at 00:01 in Brasília time (03:01 UTC)
+  workflow_dispatch: # Allows manual run as well
 
 jobs:
   update-phrase:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout do repositório
+      - name: Checkout repository
         uses: actions/checkout@v3
         with:
           token: ${{ secrets.GH_TOKEN }}
 
-      - name: Configurar Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
 
-      - name: Gerar frase do dia
+      - name: Generate daily quote
         run: |
           node -e "
             const fs = require('fs');
             const path = './frases.json';
 
             if (!fs.existsSync(path)) {
-              throw new Error('Arquivo frases.json não encontrado.');
+              throw new Error('frases.json file not found.');
             }
 
             const frases = JSON.parse(fs.readFileSync(path, 'utf8'));
             if (!Array.isArray(frases) || frases.length === 0) {
-              throw new Error('frases.json está vazio ou não é um array válido.');
+              throw new Error('frases.json is empty or not a valid array.');
             }
 
-            const hoje = new Date();
-            const diaDoAno = Math.floor((hoje - new Date(hoje.getFullYear(), 0, 0)) / 86400000);
-            const frase = frases[diaDoAno % frases.length];
+            const today = new Date();
+            const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+            const quote = frases[dayOfYear % frases.length];
 
-            if (!frase) {
-              throw new Error('Não foi possível obter a frase para o dia atual.');
+            if (!quote) {
+              throw new Error('Unable to get quote for the current day');
             }
 
-            fs.writeFileSync('frase-do-dia.txt', frase, 'utf8');
+            fs.writeFileSync('frase-do-dia.txt', quote, 'utf8');
           "
 
-      - name: Commit e push
+      - name: Commit and push
         env:
           GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
@@ -54,5 +54,5 @@ jobs:
           git config user.email "github-actions@github.com"
           git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
           git add frase-do-dia.txt
-          git commit -m "Update phrase of the day: $(date +'%d/%m/%Y')" || echo "Nothing to commit"
+          git commit -m "chore: update phrase of the day: $(date +'%d/%m/%Y')" || echo "nothing to commit"
           git push
