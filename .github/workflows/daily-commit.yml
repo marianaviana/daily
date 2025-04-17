@@ -34,5 +34,5 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add frase-do-dia.txt
-          git commit -m "Atualiza frase do dia: $(date +'%d/%m/%Y')" || echo "Nada para commitar"
+          git commit -m "Update phrase of the day: $(date +'%d/%m/%Y')" || echo "Nothing to commit"
           git push
