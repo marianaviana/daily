@@ -17,15 +17,16 @@ A atualização ocorre **todos os dias às 00:01 (horário de Brasília)**.
 - Git para versionar cada nova frase com um commit diário.
 
 ## 📁 Estrutura do repositório
-
+```
 daily/
 ├─ frases.json            ← lista de frases motivacionais
 ├─ frase-do-dia.txt       ← atualizado automaticamente
 ├─ index.html             ← página inicial do projeto
 ├─ style.css              ← estilo do projeto
-├─ .github/               ← scripts de automação com gitHub actions
-│  └─ workflows/
-│     └─ daily-commit.yml ← GitHub Action diária
+├─ .github/               ← arquivos do github
+│  └─ workflows/          ← scripts de automação com github actions
+│     └─ daily-commit.yml ← github action diária
+```
 
 ## ✨ Exemplo de uso
 
