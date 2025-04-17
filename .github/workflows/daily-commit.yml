@@ -45,9 +45,12 @@ jobs:
           "
 
       - name: Commit e push
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
+          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
           git add frase-do-dia.txt
           git commit -m "Update phrase of the day: $(date +'%d/%m/%Y')" || echo "Nothing to commit"
           git push
