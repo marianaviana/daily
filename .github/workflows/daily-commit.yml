@@ -22,11 +22,26 @@ jobs:
         run: |
           node -e "
             const fs = require('fs');
-            const frases = JSON.parse(fs.readFileSync('frases.json'));
+            const path = './frases.json';
+
+            if (!fs.existsSync(path)) {
+              throw new Error('Arquivo frases.json não encontrado.');
+            }
+
+            const frases = JSON.parse(fs.readFileSync(path, 'utf8'));
+            if (!Array.isArray(frases) || frases.length === 0) {
+              throw new Error('frases.json está vazio ou não é um array válido.');
+            }
+
             const hoje = new Date();
             const diaDoAno = Math.floor((hoje - new Date(hoje.getFullYear(), 0, 0)) / 86400000);
             const frase = frases[diaDoAno % frases.length];
-            fs.writeFileSync('frase-do-dia.txt', frase);
+
+            if (!frase) {
+              throw new Error('Não foi possível obter a frase para o dia atual.');
+            }
+
+            fs.writeFileSync('frase-do-dia.txt', frase, 'utf8');
           "
 
       - name: Commit e push
