@@ -18,14 +18,21 @@ A atualização ocorre **todos os dias às 00:01 (horário de Brasília)**.
 
 ## 📁 Estrutura do repositório
 
-- 📁 frases.json           # Lista de frases motivacionais
-- 📄 frase-do-dia.txt      # Frase atual do dia (atualizado automaticamente)
-- 🔧 .github/workflows     # Scripts de automação com GitHub Actions
+daily/
+├─ frases.json            ← lista de frases motivacionais
+├─ frase-do-dia.txt       ← atualizado automaticamente
+├─ index.html             ← página inicial do projeto
+├─ style.css              ← estilo do projeto
+├─ .github/               ← scripts de automação com gitHub actions
+│  └─ workflows/
+│     └─ daily-commit.yml ← GitHub Action diária
 
 ## ✨ Exemplo de uso
 
 Você pode consumir a frase do dia diretamente via raw do GitHub:
+```bash
 https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPOSITORIO/main/frase-do-dia.txt
+```
 
 > Basta trocar `SEU_USUARIO` e `SEU_REPOSITORIO` pelo seu nome de usuário e nome do repositório, ou [veja um exemplo aqui](https://raw.githubusercontent.com/mariviana/daily/main/frase-do-dia.txt).
 
@@ -43,4 +50,4 @@ As frases são de domínio público ou criadas por autores anônimos.
 
 ---
 
-**Feito com ☕ e inspiração por [@marianaviana](https://mariviana.dev/)**
+**Feito com ☕ e inspiração por [@marianaviana](https://github.com/marianaviana)**
