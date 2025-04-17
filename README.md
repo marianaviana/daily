@@ -18,9 +18,9 @@ A atualização ocorre **todos os dias às 00:01 (horário de Brasília)**.
 
 ## 📁 Estrutura do repositório
 
-📁 frases.json           # Lista de frases motivacionais
-📄 frase-do-dia.txt      # Frase atual do dia (atualizado automaticamente)
-🔧 .github/workflows     # Scripts de automação com GitHub Actions
+- 📁 frases.json           # Lista de frases motivacionais
+- 📄 frase-do-dia.txt      # Frase atual do dia (atualizado automaticamente)
+- 🔧 .github/workflows     # Scripts de automação com GitHub Actions
 
 ## ✨ Exemplo de uso
 
