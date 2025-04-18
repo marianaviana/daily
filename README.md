@@ -1,5 +1,8 @@
 # 🌞 Daily: Frase do Dia
 
+[![Daily Quote Workflow](https://github.com/marianaviana/daily/actions/workflows/daily-commit.yml/badge.svg)](https://github.com/marianaviana/daily/actions/workflows/daily-commit.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 Todos os dias uma nova frase motivacional é adicionada automaticamente a este repositório, com muito carinho (e um pouco de JavaScript + GitHub Actions ✨).
 
 > 💬 Ideal para começar o dia com inspiração — ou para mostrar que seu GitHub está sempre em movimento 😉
@@ -8,7 +11,7 @@ Todos os dias uma nova frase motivacional é adicionada automaticamente a este r
 
 Este repositório usa **GitHub Actions** para atualizar diariamente o arquivo `frase-do-dia.txt` com uma frase diferente, retirada de um arquivo `frases.json` contendo 365 mensagens motivacionais.
 
-A atualização ocorre **todos os dias às 00:01 (horário de Brasília)**.
+A atualização ocorre **todos os dias às 00:00 (horário de Brasília)**.
 
 ### 🔧 Tecnologias usadas
 
@@ -17,6 +20,7 @@ A atualização ocorre **todos os dias às 00:01 (horário de Brasília)**.
 - Git para versionar cada nova frase com um commit diário.
 
 ## 📁 Estrutura do repositório
+
 ```
 daily/
 ├─ frases.json            ← lista de frases motivacionais
@@ -25,7 +29,7 @@ daily/
 ├─ style.css              ← estilo do projeto
 ├─ .github/               ← arquivos do github
 │  └─ workflows/          ← scripts de automação com github actions
-│     └─ daily-commit.yml ← github action diária
+│     └─ daily-quote.yml ← github action diária
 ```
 
 ## ✨ Exemplo de uso
@@ -35,9 +39,10 @@ Você pode consumir a frase do dia diretamente via raw do GitHub:
 https://raw.githubusercontent.com/SEU_USUARIO/SEU_REPOSITORIO/main/frase-do-dia.txt
 ```
 
-> Basta trocar `SEU_USUARIO` e `SEU_REPOSITORIO` pelo seu nome de usuário e nome do repositório, ou [veja um exemplo aqui](https://raw.githubusercontent.com/mariviana/daily/main/frase-do-dia.txt).
+> Basta trocar `SEU_USUARIO` e `SEU_REPOSITORIO` pelo seu nome de usuário e nome do repositório, ou [veja um exemplo aqui](https://raw.githubusercontent.com/marianaviana/daily/main/frase-do-dia.txt).
 
 ---
+
 ## 🔐 Configurando o repositório
 
 Para que o commit automático funcione corretamente, você precisa configurar um **token de acesso pessoal (PAT)** como secret:
@@ -57,14 +62,20 @@ Para que o commit automático funcione corretamente, você precisa configurar um
 - Vá até seu repositório no GitHub
 - Clique em **Settings > Secrets and variables > Actions**
 - Clique em **New repository secret**
-- Nome: `GH_TOKEN`
+- Nome: `MY_PERSONAL_TOKEN`
 - Valor: (cole aqui o token gerado)
+
+⚠️ A primeira execução do workflow precisa ser feita manualmente para iniciar o processo.
 
 ---
 
 ## 🧪 Executando manualmente
 
-Se quiser testar a ação manualmente, acesse a aba **"Actions"** do repositório e clique em **"Run workflow"** no fluxo `update-daily-quote`.
+Se quiser testar a ação manualmente:
+
+1. Acesse a aba **"Actions"** do repositório
+2. Selecione o fluxo `update-daily-quote`
+3. Clique em **"Run workflow"**
 
 ---
 
@@ -75,7 +86,8 @@ Compartilhar boas palavras também é um ato de generosidade. 🌻
 
 ## 📜 Licença
 
-Este projeto está sob a licença MIT.  
+[MIT](LICENSE)
+
 As frases são de domínio público ou criadas por autores anônimos.
 
 ---
