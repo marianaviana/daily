@@ -2,8 +2,8 @@ name: update-daily-quote
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # Every day at 00:01 in Brasília time (03:01 UTC)
-  workflow_dispatch: # Allows manual run as well
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
 
 jobs:
   update-phrase:
@@ -13,7 +13,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.MY_PERSONAL_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
@@ -48,11 +48,11 @@ jobs:
 
       - name: Commit and push
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          PERSONAL_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
+          git config user.name "Mariana Viana"
+          git config user.email "marianaviana@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${MY_PERSONAL_TOKEN}@github.com/${{ github.repository }}
           git add frase-do-dia.txt
           git commit -m "chore: update phrase of the day: $(date +'%d/%m/%Y')" || echo "nothing to commit"
           git push
