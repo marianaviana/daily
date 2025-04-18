@@ -5,14 +5,27 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Frase do Dia - Mariana Viana</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
   <div class="container">
-    <h1>Frase do Dia</h1>
+    <div class="oop"></div>
     <blockquote id="frase">Carregando frase...</blockquote>
     <span class="data" id="data"></span>
+    <div id="compartilhar">
+      <p class="cta">Gostou da frase? Compartilhe com o mundo 💫</p>
+      <a href="#" target="_blank" title="Compartilhar no Twitter">
+        <i class="fab fa-twitter fa-lg"></i>
+      </a>
+      <a href="#" target="_blank" title="Compartilhar no Facebook">
+        <i class="fab fa-facebook fa-lg"></i>
+      </a>
+      <a href="#" target="_blank" title="Compartilhar no WhatsApp">
+        <i class="fab fa-whatsapp fa-lg"></i>
+      </a>
+    </div>
   </div>
 
   <script>
@@ -20,7 +33,18 @@
       .then(response => response.text())
       .then(text => {
         const frase = text.split("Updated on:")[0].trim();
-        document.getElementById('frase').textContent = frase;
+        const fraseElement = document.getElementById('frase');
+        fraseElement.textContent = frase;
+
+        const encodedFrase = encodeURIComponent(fraseElement.textContent);
+
+        // Atualiza os links dos botões com ícones
+        document.querySelector('#compartilhar a[title*="Twitter"]').href =
+          `https://twitter.com/intent/tweet?text=${encodedFrase}`;
+        document.querySelector('#compartilhar a[title*="Facebook"]').href =
+          `https://www.facebook.com/sharer/sharer.php?u=${encodedFrase}`;
+        document.querySelector('#compartilhar a[title*="WhatsApp"]').href =
+          `https://api.whatsapp.com/send?text=${encodedFrase}`;
       });
 
     const hoje = new Date();
