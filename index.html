@@ -19,7 +19,8 @@
     fetch('frase-do-dia.txt')
       .then(response => response.text())
       .then(text => {
-        document.getElementById('frase').textContent = text.trim();
+        const frase = text.split("Updated on:")[0].trim();
+        document.getElementById('frase').textContent = frase;
       });
 
     const hoje = new Date();
