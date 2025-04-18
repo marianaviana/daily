@@ -2,7 +2,7 @@ name: update-daily-quote
 
 on:
   schedule:
-    - cron: "1 3 * * *" # Every day at 00:01 in Brasília time (03:01 UTC)
+    - cron: "*/5 * * * *" # Every day at 00:01 in Brasília time (03:01 UTC)
   workflow_dispatch: # Allows manual run as well
 
 jobs:
