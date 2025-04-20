@@ -80,7 +80,6 @@ jobs:
           automatic update of the motivational phrase of the day.
 
           **quote:** "${{ steps.get-quote.outputs.quote }}"
-          **date:** $(date +'%Y-%m-%d')
 
           auto merge enabled if it passes the lighthouse check.
         branch: ${{ steps.set-branch.outputs.branch_name }}
