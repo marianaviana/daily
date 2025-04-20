@@ -1,4 +1,4 @@
-name: update-daily-quote
+-name: update-daily-quote
 
 on:
   schedule:
@@ -6,26 +6,28 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-phrase:
+  update-phrase-and-pr:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        with:
-          token: ${{ secrets.MY_PERSONAL_TOKEN }}
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.MY_PERSONAL_TOKEN }}
+        fetch-depth: 0
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16
+    - name: setup node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
 
-      - name: Generate daily quote
-        run: |
-          node -e "
-            const fs = require('fs');
-            const path = './frases.json';
+    - name: get daily quote
+      id: get-quote
+      run: |
+        node -e "
+          const fs = require('fs');
+          const path = './frases.json';
 
+          try {
             if (!fs.existsSync(path)) {
               throw new Error('frases.json file not found.');
             }
@@ -39,21 +41,95 @@ jobs:
             const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
             const quote = frases[dayOfYear % frases.length];
 
-            if (!quote) {
+            if (!quote?.trim()) {
               throw new Error('Unable to get quote for the current day');
             }
 
             const content = quote + '\n\nUpdated on: ' + today.toLocaleString('pt-BR');
             fs.writeFileSync('frase-do-dia.txt', content, 'utf8');
-          "
 
-      - name: Commit and push
-        env:
-          PERSONAL_TOKEN: ${{ secrets.MY_PERSONAL_TOKEN }}
-        run: |
-          git config user.name "Mariana Viana"
-          git config user.email "marianaviana@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${MY_PERSONAL_TOKEN}@github.com/${{ github.repository }}
-          git add frase-do-dia.txt
-          git commit -m "chore: update phrase of the day: $(date +'%d/%m/%Y')" || echo "nothing to commit"
-          git push
+            console.log('::set-output name=quote::' + quote.substring(0, 30) + (quote.length > 30 ? '...' : ''));
+          } catch (error) {
+            console.error('::error::' + error.message);
+            process.exit(1);
+          }
+        "
+
+    - name: commit changes
+      if: success()
+      run: |
+        git config --global user.name "Mariana Viana"
+        git config --global user.email "marianaviana@users.noreply.github.com"
+        git add .
+        git commit -m "chore: update daily quote [$(date +'%Y-%m-%d')]" || \
+          echo "::warning::no changes to commit"
+        git push origin HEAD:daily-update-$(date +'%Y-%m-%d') || \
+          echo "::warning::push failed or branch already exists"
+
+    - name: create pull request
+      id: create-pr
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.MY_PERSONAL_TOKEN }}
+        commit-message: "chore: update daily quote [$(date +'%Y-%m-%d')]"
+        title: "chore: daily quote update [$(date +'%m/%d')]"
+        body: |
+          automatic update of the motivational phrase of the day.
+
+          **quote:** "${{ steps.get-quote.outputs.quote }}"
+
+          auto merge enabled if it passes the lighthouse check.
+        branch: "daily-update-$(date +'%Y-%m-%d')"
+        base: main
+        delete-branch: true
+        labels: "automated"
+
+  lighthouse-check:
+    needs: update-and-pr
+    if: needs.update-and-pr.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.MY_PERSONAL_TOKEN }}
+
+    - name: run lighthouse check
+      uses: foo-software/lighthouse-check-action@v10
+      with:
+        accessToken: ${{ secrets.MY_PERSONAL_TOKEN }}
+        urls: "https://mariviana.dev/daily/"
+        minAccessibilityScore: "90"
+        minBestPracticesScore: "90"
+        minPerformanceScore: "90"
+        minSeoScore: "90"
+        prCommentEnabled: true
+        prCommentUrl: ${{ needs.update-and-pr.outputs.create-pr.pull-request-url }}
+
+    - name: approve and merge pr
+      if: success()
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.MY_PERSONAL_TOKEN }}
+        script: |
+          try {
+            const prNumber = ${{ needs.update-and-pr.outputs.create-pr.pull-request-number }};
+            await github.rest.pulls.createReview({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              event: 'APPROVE',
+              body: 'automatically approved via headlight check'
+            });
+
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              merge_method: 'merge',
+              commit_title: "chore: merge daily quote update [$(date +'%Y-%m-%d')]",
+              commit_message: 'auto merge after validation'
+            });
+          } catch (error) {
+            console.error('error in automatic merge:', error);
+            core.setFailed('auto merge failed');
+          }
