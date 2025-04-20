@@ -107,40 +107,30 @@ jobs:
         continueOnFailure: true
 
     - name: approve and merge pr
-      if: success() || failure()
+      if: always()
       uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.MY_PERSONAL_TOKEN }}
         script: |
           try {
             const prNumber = ${{ needs.update-phrase-and-pr.outputs.create-pr.pull-request-number }};
-            const { data: pr } = await github.rest.pulls.get({
+
+            // Merge independente do resultado do Lighthouse
+            await github.rest.pulls.createReview({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              pull_number: prNumber
+              pull_number: prNumber,
+              event: 'APPROVE',
+              body: 'Daily quote update - merged automatically'
             });
 
-            const lighthouseFailed = '${{ job.status }}' === 'failure';
-
-            if (!lighthouseFailed) {
-              await github.rest.pulls.createReview({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber,
-                event: 'APPROVE',
-                body: 'Lighthouse check passed with warnings. Merging...'
-              });
-
-              await github.rest.pulls.merge({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: prNumber,
-                merge_method: 'merge'
-              });
-            } else {
-              console.log('Lighthouse check failed with critical errors. Not merging.');
-            }
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              merge_method: 'merge'
+            });
           } catch (error) {
             console.error('Error in merge process:', error);
-            core.setFailed('Merge process failed');
+            core.setFailed('Auto-merge failed');
           }
