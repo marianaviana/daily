@@ -19,6 +19,10 @@ jobs:
       with:
         node-version: '20'
 
+    - name: set branch name
+      id: set-branch
+      run: echo "branch_name=daily-update-$(date -u +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
     - name: get daily quote
       id: get-quote
       run: |
@@ -62,7 +66,7 @@ jobs:
         git add .
         git commit -m "chore: update daily quote [$(date +'%Y-%m-%d')]" || \
           echo "::warning::no changes to commit"
-        git push origin HEAD:daily-update-$(date +'%Y-%m-%d') || \
+        git push origin HEAD:${{ steps.set-branch.outputs.branch_name }} || \
           echo "::warning::push failed or branch already exists"
 
     - name: create pull request
@@ -78,7 +82,7 @@ jobs:
           **quote:** "${{ steps.get-quote.outputs.quote }}"
 
           auto merge enabled if it passes the lighthouse check.
-        branch: "daily-update-$(date -u +'%Y-%m-%d')"
+        branch: ${{ steps.set-branch.outputs.branch_name }}
         base: main
         delete-branch: true
         labels: "automated"
@@ -117,7 +121,7 @@ jobs:
               repo: context.repo.repo,
               pull_number: prNumber,
               event: 'APPROVE',
-              body: 'automatically approved via headlight check'
+              body: 'automatically approved via lighthouse check'
             });
 
             await github.rest.pulls.merge({
