@@ -85,8 +85,8 @@ jobs:
         labels: "automated"
 
   lighthouse-check:
-    needs: update-and-pr
-    if: needs.update-and-pr.result == 'success'
+    needs: update-phrase-and-pr
+    if: needs.update-phrase-and-pr.result == 'success'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -103,7 +103,7 @@ jobs:
         minPerformanceScore: "90"
         minSeoScore: "90"
         prCommentEnabled: true
-        prCommentUrl: ${{ needs.update-and-pr.outputs.create-pr.pull-request-url }}
+        prCommentUrl: ${{ needs.update-phrase-and-pr.outputs.create-pr.pull-request-url }}
 
     - name: approve and merge pr
       if: success()
@@ -112,7 +112,7 @@ jobs:
         github-token: ${{ secrets.MY_PERSONAL_TOKEN }}
         script: |
           try {
-            const prNumber = ${{ needs.update-and-pr.outputs.create-pr.pull-request-number }};
+            const prNumber = ${{ needs.update-phrase-and-pr.outputs.create-pr.pull-request-number }};
             await github.rest.pulls.createReview({
               owner: context.repo.owner,
               repo: context.repo.repo,
