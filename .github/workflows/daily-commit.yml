@@ -75,11 +75,12 @@ jobs:
       with:
         token: ${{ secrets.MY_PERSONAL_TOKEN }}
         commit-message: "chore: update daily quote [$(date +'%Y-%m-%d')]"
-        title: "chore: daily quote update [$(date +'%m/%d')]"
+        title: "chore: daily quote update"
         body: |
           automatic update of the motivational phrase of the day.
 
           **quote:** "${{ steps.get-quote.outputs.quote }}"
+          **date:** $(date +'%Y-%m-%d')
 
           auto merge enabled if it passes the lighthouse check.
         branch: ${{ steps.set-branch.outputs.branch_name }}
@@ -97,16 +98,12 @@ jobs:
         token: ${{ secrets.MY_PERSONAL_TOKEN }}
 
     - name: run lighthouse check
-      uses: foo-software/lighthouse-check-action@v10
+      uses: treosh/lighthouse-ci-action@v11
       with:
-        accessToken: ${{ secrets.MY_PERSONAL_TOKEN }}
         urls: "https://mariviana.dev/daily/"
-        minAccessibilityScore: "90"
-        minBestPracticesScore: "90"
-        minPerformanceScore: "90"
-        minSeoScore: "90"
-        prCommentEnabled: true
-        prCommentUrl: ${{ needs.update-phrase-and-pr.outputs.create-pr.pull-request-url }}
+        uploadArtifacts: true
+        temporaryPublicStorage: true
+        configPath: ./.github/lighthouserc.json
 
     - name: approve and merge pr
       if: success()
