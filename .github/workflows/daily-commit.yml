@@ -80,56 +80,30 @@ jobs:
           automatic update of the motivational phrase of the day.
 
           **quote:** "${{ steps.get-quote.outputs.quote }}"
-
-          auto merge enabled if it passes the lighthouse check.
         branch: ${{ steps.set-branch.outputs.branch_name }}
         base: main
         delete-branch: true
         labels: "automated"
 
-  lighthouse-check:
+  auto-merge:
     needs: update-phrase-and-pr
-    if: needs.update-phrase-and-pr.result == 'success'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.MY_PERSONAL_TOKEN }}
-
-    - name: run lighthouse check
-      uses: treosh/lighthouse-ci-action@v11
-      with:
-        urls: "https://mariviana.dev/daily/"
-        uploadArtifacts: true
-        temporaryPublicStorage: true
-        configPath: ./.github/lighthouserc.json
-        continueOnFailure: true
-
-    - name: approve and merge pr
-      if: always()
-      uses: actions/github-script@v7
+    - uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.MY_PERSONAL_TOKEN }}
         script: |
           try {
             const prNumber = ${{ needs.update-phrase-and-pr.outputs.create-pr.pull-request-number }};
-
-            // Merge independente do resultado do Lighthouse
-            await github.rest.pulls.createReview({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              event: 'APPROVE',
-              body: 'Daily quote update - merged automatically'
-            });
-
             await github.rest.pulls.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber,
-              merge_method: 'merge'
+              merge_method: 'merge',
+              commit_title: "chore: merge daily quote update [$(date +'%Y-%m-%d')]",
+              commit_message: 'auto merge'
             });
           } catch (error) {
-            console.error('Error in merge process:', error);
-            core.setFailed('Auto-merge failed');
+            console.error('Auto-merge failed:', error);
+            core.setFailed('Failed to auto-merge PR');
           }
