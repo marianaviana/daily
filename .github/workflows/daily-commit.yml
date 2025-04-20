@@ -78,7 +78,7 @@ jobs:
           **quote:** "${{ steps.get-quote.outputs.quote }}"
 
           auto merge enabled if it passes the lighthouse check.
-        branch: "daily-update-$(date +'%Y-%m-%d')"
+        branch: "daily-update-$(date -u +'%Y-%m-%d')"
         base: main
         delete-branch: true
         labels: "automated"
