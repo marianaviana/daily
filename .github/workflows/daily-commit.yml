@@ -8,6 +8,8 @@ on:
 jobs:
   update-phrase-and-pr:
     runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.create-pr.outputs.pr-number }}
     steps:
     - uses: actions/checkout@v4
       with:
@@ -80,6 +82,7 @@ jobs:
           automatic update of the motivational phrase of the day.
 
           **quote:** "${{ steps.get-quote.outputs.quote }}"
+          **date:** $(date +'%Y-%m-%d')
         branch: ${{ steps.set-branch.outputs.branch_name }}
         base: main
         delete-branch: true
@@ -89,12 +92,29 @@ jobs:
     needs: update-phrase-and-pr
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/github-script@v7
+    - name: Wait for PR to be ready
+      run: sleep 10
+
+    - name: Auto-merge PR
+      uses: actions/github-script@v7
       with:
         github-token: ${{ secrets.MY_PERSONAL_TOKEN }}
         script: |
           try {
-            const prNumber = ${{ needs.update-phrase-and-pr.outputs.create-pr.pull-request-number }};
+            const prs = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: context.repo.owner + ':daily-update-' + new Date().toISOString().split('T')[0]
+            });
+
+            if (prs.data.length === 0) {
+              console.log('No PR found for today');
+              return;
+            }
+
+            const prNumber = prs.data[0].number;
+
             await github.rest.pulls.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
